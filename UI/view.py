@@ -14,29 +14,31 @@ class View(ft.UserControl):
         self._title = None
 
     def load_interface(self):
-        # title
+        """Si costruisce l'interfaccia grafica con i suoi elementi"""
         self._title = ft.Text("TdP Flights Manager 2026", color="blue", size=24)
         self._page.controls.append(self._title)
 
-        #ROW 1
+        # Inizializzazione Elementi - ROW 1
         self._txtInCMin = ft.TextField(label ="N min compagnie")
-        self._btnAnalizzaAeroporti = ft.ElevatedButton(text="Analizza", on_click=self._controller.handleAnalizza)
-        row1 = ft.Row([
-            ft.Container(content= None, width=250),
+        self._btnAnalizzaAeroporti = ft.ElevatedButton(text="Analizza",
+                                                       on_click=self._controller.handleAnalizza) # collegamento Controller
+        row1 = ft.Row([ # inseriamo gli elementi nella riga
+            ft.Container(content= None, width=250), # primo container vuoto per lasciare spazio
             ft.Container(self._txtInCMin, width=250),
             ft.Container(self._btnAnalizzaAeroporti, width=250) ],
             alignment=ft.MainAxisAlignment.CENTER)
 
-        # ROW 2
+        # Inizializzazione Elementi - ROW 2
         self._ddAeroportoP = ft.Dropdown(label="Aeroporto di Partenza")
-        self._btnAeroportiConnessi = ft.ElevatedButton(text="Aeroporti Connessi", on_click=self._controller.handleConnessi)
-        row2 = ft.Row([
-            ft.Container(content=None, width=250),
+        self._btnAeroportiConnessi = ft.ElevatedButton(text="Aeroporti Connessi",
+                                                       on_click=self._controller.handleConnessi) # collegamento Controller
+        row2 = ft.Row([ # inseriamo gli elementi nella riga
+            ft.Container(content=None, width=250), # primo container vuoto per lasciare spazio
             ft.Container(self._ddAeroportoP, width=250),
             ft.Container(self._btnAeroportiConnessi, width=250)],
             alignment=ft.MainAxisAlignment.CENTER)
 
-        # ROW 3
+        # Inizializzazione Elementi - ROW 3
         self._ddAeroportoA = ft.Dropdown(label="Aeroporto di Destinazione")
         self._txtInNTratteMax = ft.TextField(label="Num Tratte Max")
         self._btnCercaItinerario = ft.ElevatedButton(text="Cerca Itinerario",
@@ -48,11 +50,12 @@ class View(ft.UserControl):
             ft.Container(self._btnCercaItinerario, width=250)],
             alignment=ft.MainAxisAlignment.CENTER)
 
-        # List View where the reply is printed
+        # List View
         self._txtResults = ft.ListView(expand=1, spacing=10, padding=20, auto_scroll=True)
         self._page.add(row1, row2, row3, self._txtResults)
         self._page.update()
 
+    """Metodi di supporto al codice (getter/setter/alert)"""
     @property
     def controller(self):
         return self._controller

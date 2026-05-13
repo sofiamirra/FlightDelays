@@ -1,3 +1,4 @@
+"""Oggetto di classe Aeroporto per la creazione dei nodi"""
 from dataclasses import dataclass
 
 @dataclass

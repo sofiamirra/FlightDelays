@@ -1,18 +1,16 @@
 from database.DB_connect import DBConnect
 from model.airport import Airport
-
+from model.tratta import Tratta
 
 class DAO():
 
     @staticmethod
     def getAllAirports():
         conn = DBConnect.get_connection()
-
         result = []
-
         cursor = conn.cursor(dictionary=True)
-        query = """SELECT * from airports a order by a.AIRPORT asc"""
 
+        query = """SELECT * from airports a order by a.AIRPORT asc"""
         cursor.execute(query)
 
         for row in cursor:
@@ -23,12 +21,11 @@ class DAO():
         return result
 
     @staticmethod
-    def getAllNodes():
+    def getAllNodes(n, idMapA):
         conn = DBConnect.get_connection()
-
         result = []
-
         cursor = conn.cursor(dictionary=True)
+
         # Query che, per ogni aeroporto, conta quante compagnie ci volano
         query = """SELECT t.ID, t.IATA_CODE, count(*) as N
                     FROM (select a.ID, a.IATA_CODE, f.AIRLINE_ID, count(*)
@@ -37,13 +34,36 @@ class DAO():
                     or a.ID = f.DESTINATION_AIRPORT_ID 
                     GROUP BY a.ID, a.IATA_CODE, f.AIRLINE_ID ) t
                     GROUP BY t.ID, t.IATA_CODE
-                    having N >= 5
+                    having N >= %s
                     order by N asc"""
+        cursor.execute(query, (n, ))
 
+        for row in cursor:
+            result.append(idMapA[row["ID"]])
+
+        cursor.close()
+        conn.close()
+        return result
+
+    @staticmethod
+    def getAllEdges(idMapA):
+        conn = DBConnect.get_connection()
+        result = []
+        cursor = conn.cursor(dictionary=True)
+
+        # Query che, per ogni aeroporto, conta quante compagnie ci volano
+        query = """SELECT f.ORIGIN_AIRPORT_ID , f.DESTINATION_AIRPORT_ID, count(*) as peso 
+                    FROM flights f
+                    GROUP BY f.ORIGIN_AIRPORT_ID, f.DESTINATION_AIRPORT_ID
+                    ORDER BY f.ORIGIN_AIRPORT_ID, f.DESTINATION_AIRPORT_ID
+                    """
         cursor.execute(query)
 
         for row in cursor:
-            result.append(Airport(**row))
+            result.append(Tratta(
+                idMapA[row["ORIGIN_AIRPORT_ID"]],
+                idMapA[row["DESTINATION_AIRPORT_ID"]],
+                row["peso"]))
 
         cursor.close()
         conn.close()
