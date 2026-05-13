@@ -1,17 +1,16 @@
 import flet as ft
 
-
 class View(ft.UserControl):
     def __init__(self, page: ft.Page):
         super().__init__()
-        # page stuff
+        # Inizializzare impostazioni di pagina
         self._page = page
-        self._page.title = "Template application using MVC and DAO"
+        self._page.title = "TdP Flights Manager 2026"
         self._page.horizontal_alignment = 'CENTER'
         self._page.theme_mode = ft.ThemeMode.LIGHT
-        # controller (it is not initialized. Must be initialized in the main, after the controller is created)
+        # Controller non si inzializza: resta None
         self._controller = None
-        # graphical elements
+        # Elementi grafici (opzionali)
         self._title = None
 
     def load_interface(self):
