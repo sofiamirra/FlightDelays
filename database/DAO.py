@@ -6,14 +6,16 @@ class DAO():
 
     @staticmethod
     def getAllAirports():
+        """Recupera tytti gli aeroporti per popolare la mappa del Model"""
         conn = DBConnect.get_connection()
         result = []
         cursor = conn.cursor(dictionary=True)
-
+        # Query semplice per costuire l'oggetto Airport
         query = """SELECT * from airports a order by a.AIRPORT asc"""
         cursor.execute(query)
 
         for row in cursor:
+            # Il costrutto **row, mappa le colonne del DB agli attributi dell'oggetto
             result.append(Airport(**row))
 
         cursor.close()
@@ -22,11 +24,12 @@ class DAO():
 
     @staticmethod
     def getAllNodes(n, idMapA):
+        """Recupera solo gli aeroporti con almeno N compagnie di volo (nodi del grafo)"""
         conn = DBConnect.get_connection()
         result = []
         cursor = conn.cursor(dictionary=True)
-
-        # Query che, per ogni aeroporto, conta quante compagnie ci volano
+        # La subquery conta prima le compagnie per ogni aeroporto
+        # poi filtra quelli che ne hanno almeno N
         query = """SELECT t.ID, t.IATA_CODE, count(*) as N
                     FROM (select a.ID, a.IATA_CODE, f.AIRLINE_ID, count(*)
                     from airports a, flights f
@@ -39,6 +42,7 @@ class DAO():
         cursor.execute(query, (n, ))
 
         for row in cursor:
+            # Inserisce tra i risultati l'oggetto Airport con l'ID dato dal DB
             result.append(idMapA[row["ID"]])
 
         cursor.close()
@@ -47,11 +51,12 @@ class DAO():
 
     @staticmethod
     def getAllEdges(idMapA):
+        """Recupera tutte le rotte e conta i voli totali tra coppie di aeroporti"""
         conn = DBConnect.get_connection()
         result = []
         cursor = conn.cursor(dictionary=True)
 
-        # Query che, per ogni aeroporto, conta quante compagnie ci volano
+        # Conta il totale dei voli che partono da A1 e arrivano a A2 (es. Roma, Milano, 500)
         query = """SELECT f.ORIGIN_AIRPORT_ID , f.DESTINATION_AIRPORT_ID, count(*) as peso 
                     FROM flights f
                     GROUP BY f.ORIGIN_AIRPORT_ID, f.DESTINATION_AIRPORT_ID

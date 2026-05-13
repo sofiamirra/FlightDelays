@@ -1,4 +1,4 @@
-"""Creiamo apposito oggetto, anzichè una tupla, per poter accedere più facilmente agli attributi"""
+"""Il DAO restituisce un oggetto Tratta, anzichè una tupla, che impaccheta le informazioni"""
 from dataclasses import dataclass
 from model.airport import Airport
 

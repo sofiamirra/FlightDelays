@@ -2,21 +2,15 @@ import flet as ft
 
 class Controller:
     def __init__(self, view, model):
-        # the view, with the graphical elements of the UI
-        self._view = view
-        # the model, which implements the logic of the program and holds the data
-        self._model = model
+        self._view = view # riferimento alla UI
+        self._model = model # riferimento alla logica
         self._choicePartenza = None
         self._choiceArrivo = None
 
     def handleAnalizza(self, e):
+        """Gestisce il click su Analizza Aeroporti"""
+        # 1. Lettura e validazione dell'input
         cMinTxt = self._view._txtInCMin.value
-        if cMinTxt == "":
-            self._view._txtResults.controls.clear()
-            self._view._txtResults.controls.append(ft.Text("Inserire un valore numerico per numero minimo compagnia!"))
-            self._view.update_page()
-            return
-
         try:
             cMin = int(cMinTxt)
         except ValueError:
@@ -32,19 +26,21 @@ class Controller:
             self._view.update_page()
             return
 
+        # Esecuzione Logica
         self._model.buildGraph(cMin)
-        nNodes, nEdges = self._model.getGraphDetails()
-        allNodes = self._model.getAllNodes()
-        self._fillDropdown(allNodes)
 
+        # Recupero Risultati e Aggiornamento UI
+        nNodes, nEdges = self._model.getGraphDetails()
         self._view._txtResults.controls.clear()
         self._view._txtResults.controls.append(
             ft.Text("Grafo correttamente creato:", color="green"))
         self._view._txtResults.controls.append(
             ft.Text(f"Il grafo contiene {nNodes} nodi e {nEdges} archi."))
+
+        # Popolamento DropDown
+        allNodes = self._model.getAllNodes()
+        self._fillDropdown(allNodes)
         self._view.update_page()
-
-
 
     def handleConnessi(self, e):
         pass
@@ -53,7 +49,7 @@ class Controller:
         pass
 
     def _fillDropdown(self, allNodes):
-        """Cicliamo su ogni nodo ed aggiugniamo le opzioni nel menù a tendina"""
+        """Per ciascun Aeroporto (nodo) si crea un'opzione del menù a tendina"""
         for node in allNodes:
             self._view._ddAeroportoP.options.append(ft.dropdown.Option(data=node,
                                                                        key= node.IATA_CODE,
@@ -64,6 +60,7 @@ class Controller:
                                                                        on_click=self._choiceDdArrivo))
 
     def _choiceDdPartenza(self, e):
+        """Il Controller estrae l'oggetto Airport e lo salva nella variabile"""
         self._choicePartenza = e.control.data
         print(self._choicePartenza)
 
